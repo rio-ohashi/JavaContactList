@@ -36,8 +36,10 @@ public enum Menu {
                 return REMOVE;
             case 4:
                 return UPDATE;
-            default:
+            case 5:
                 return QUIT;
+            default:
+                return INIT;
         }
     }
 }

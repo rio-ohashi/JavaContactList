@@ -1,33 +1,17 @@
 public class Controller {
     private ContactList contacts;
 
-    public void displayDefault(){
-        final String menu =
-                "+======Contact App=====+\n" +
-                        "| 1. List all Contacts | \n" +
-                        "| 2. Add new Contact   | \n" +
-                        "| 3. Remove Contact    | \n" +
-                        "| 4. Update Contact    | \n" +
-                        "| 5. Quit              | \n" +
-                        "+======================+";
-
-        System.out.println(menu);
-    }
-
     public void start() {
         contacts = new ContactList();
-        String usernameInput = Menu.INIT.toString();
+        int usernameInput = Menu.INIT.getIndex();
 
-        while (!usernameInput.equals(String.valueOf(Menu.QUIT.getIndex()))) {
+        while (usernameInput != Menu.QUIT.getIndex()) {
             displayDefault();
-            usernameInput = InputCollector.getUserInput("Enter your option");
+            usernameInput = InputCollector.getUserInputNumber("Enter your option");
 
-            if (!Menu.isIn(Integer.parseInt(usernameInput))) {
-                System.out.println("Invalid Input. Enter number between 1 and 5!!");
-                continue;
-            }
+            if (!Validator.isMenuOptionNumber(usernameInput)) continue;
 
-            switch (Menu.getMenu(Integer.valueOf(usernameInput))) {
+            switch (Menu.getMenu(usernameInput)) {
                 case LIST:
                     list();
                     break;
@@ -48,50 +32,63 @@ public class Controller {
     }
 
     private void list() {
-        if (contacts.isEmpty()) return;
+        if (!Validator.isExistContactData(contacts.getContacts())) return;
 
         contacts.displayContactsList();
     }
 
     private void createContact() {
         String name = InputCollector.getUserInput("Enter your full name");
-        int mobile = Integer.parseInt(InputCollector.getUserInput("Enter your mobile number"));
+        int mobile = InputCollector.getUserInputNumber("Enter your mobile number");
+
+        if (Validator.isDuplicateContactData(contacts.getContacts(), name, mobile)) return;
         contacts.addContact(name, mobile);
     }
 
     private void removeContact() {
-        if (contacts.isEmpty()) return;
+        if (!Validator.isExistContactData(contacts.getContacts())) return;
 
         contacts.displayContactsList();
 
-        int id = Integer.parseInt(InputCollector.getUserInput("Enter id that you want to remove contact"));
+        int id = InputCollector.getUserInputNumber("Enter id that you want to remove contact");
 
-        if (!contacts.isExistContactById(id)) return;
+        if (!Validator.isExistContactById(contacts.getContacts(), id)) return;
 
         Contact targetContact = contacts.getContactById(id);
         contacts.removeContact(targetContact);
     }
 
     private void updateContact() {
-        if (contacts.isEmpty()) return;
+        if (!Validator.isExistContactData(contacts.getContacts())) return;
 
         contacts.displayContactsList();
 
-        int id = Integer.parseInt(InputCollector.getUserInput("Enter id that you want to change contact"));
+        int id = InputCollector.getUserInputNumber("Enter id that you want to remove contact");
 
-        if (!contacts.isExistContactById(id)) return;
-
-        Contact targetContact = contacts.getContactById(id);
+        if (!Validator.isExistContactById(contacts.getContacts(), id)) return;
 
         String name = InputCollector.getUserInput("Enter your full name");
-        int mobile = Integer.parseInt(InputCollector.getUserInput("Enter your mobile number"));
-        targetContact.setName(name);
-        targetContact.setMobile(mobile);
+        int mobile = InputCollector.getUserInputNumber("Enter your mobile number");
 
-        contacts.updateContact(targetContact);
+        if (Validator.isDuplicateContactData(contacts.getContacts(), name, mobile)) return;
+
+        contacts.updateContact(id, name, mobile);
     }
 
     private void quitContact() {
         System.out.println("Bye!");
+    }
+
+    public void displayDefault(){
+        final String menu =
+                "+======Contact App=====+\n" +
+                        "| 1. List all Contacts | \n" +
+                        "| 2. Add new Contact   | \n" +
+                        "| 3. Remove Contact    | \n" +
+                        "| 4. Update Contact    | \n" +
+                        "| 5. Quit              | \n" +
+                        "+======================+";
+
+        System.out.println(menu);
     }
 }
